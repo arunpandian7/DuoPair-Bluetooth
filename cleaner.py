@@ -1,15 +1,5 @@
 #!/usr/bin/env python
-import argparse
 import codecs
-
-
-def _parse_args():
-    """Parse arguments."""
-    parser = argparse.ArgumentParser()
-    parser.add_argument('file_path', help='Path of file to convert.')
-    parser.add_argument('output', help='Output location of file.')
-
-    return parser.parse_args()
 
 
 def _reg_file_to_str(file_path):
@@ -38,13 +28,8 @@ def _save_str_to_file(contents, file_path):
         f.write(contents.encode('utf-8'))
 
 
-def main():
+def clean_reg_file(args):
     """Main entrypoint to script."""
-    args = _parse_args()
-    file_contents = _reg_file_to_str(args.file_path)
+    file_contents = _reg_file_to_str(args.reg_path)
     file_contents = _clean(file_contents)
     _save_str_to_file(file_contents, args.output)
-
-
-if __name__ == '__main__':
-    main()

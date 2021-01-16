@@ -1,13 +1,14 @@
 import configparser
 import argparse
 import os
+from cleaner import clean_reg_file
 
 
 def _parse_args():
     """Parse arguments."""
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        '--reg_path', help='Path to reg file.', default='keys.reg')
+        '--reg_path', help='Path to BTKeys.reg file.', default='BTkeys.reg')
 
     return parser.parse_args()
 
@@ -95,7 +96,9 @@ def _process_reg_file(config):
 def main():
     """ Main entrypoint to script. """
     args = _parse_args()
-    config = _open_reg_file(args.reg_path)
+    args['output_file'] = 'keys.reg'
+    clean_reg_file(args)
+    config = _open_reg_file(args.output_file)
     _process_reg_file(config)
 
 
