@@ -1,5 +1,6 @@
 import configparser
 import argparse
+import os
 
 
 def _parse_args():
@@ -21,69 +22,66 @@ def _open_reg_file(file_path):
 
 def _insert_mac_colons(mac):
     """ Bluetooth Mac directory file name."""
-    mac = mac.upper()
-    mac_parts = [mac[i:i + 2] for i in range(0, len(mac), 2)]
-    # import pdb; pdb.set_trace()
-    return ':'.join(mac_parts)
+    if mac != "masterirk":
+        mac = mac.upper()
+        mac_parts = [mac[i:i + 2] for i in range(0, len(mac), 2)]
+        # import pdb; pdb.set_trace()
+        return ':'.join(mac_parts)
+    else:
+        return None
 
 
 def _bluetooth_dir_name(section_name):
     """ Return the bluetooth directory name."""
     full_path = section_name.split('\\')
-    last_two_macs = full_path[-2:]
+    last_two_macs = full_path[-1:]
     path_parts = []
     for mac in last_two_macs:
         path_parts.append(_insert_mac_colons(mac))
-
+    print(path_parts)
     return '/'.join(path_parts)
 
+def _process_key(key):
+    """ Returns Valid Key value after removing cluters"""
+    key = key.replace("hex:", "")
+    key = key.replace(',',"")
+    return key.upper()
+def _get_info(adapter, device):
+    device = _insert_mac_colons(device)
+    os.system(f'./get_info.sh {adapter} {device}')
+    info_parser = configparser.ConfigParser()
+    info_parser.read_file(open(f'{device}.config'))
+    if not info_parser.sections() == []:
+        device_name = info_parser['General']['Name']
+        key = info_parser['LinkKey']['Key']
+        return device_name, key
 
-def _format_erand(erand):
-    """ Reverse erang and return uppercase."""
-    erand = erand.replace('hex(b):', '')
-    erand_parts = erand.split(',')
-    erand_parts.reverse()
-    hex_str = ''.join(erand_parts)
-    dec = int(hex_str, 16)
-
-    return dec
-
-
-def _format_ediv(ediv):
-    """ Convert ediv to decimal and return."""
-    ediv = ediv.replace('dword:', '')
-    return int(ediv, 16)
-
-
-
-def _format_ltk(ltk):
-    """ Convert LTK to uppercase and remove commas."""
-    return ltk.lstrip('hex:').upper().replace(',', '')
-
-
-def _format_csrk(csrk):
-    """ Convert CSRK to uppercase and remove commas."""
-    return csrk.replace('hex:', '').replace(',', '').upper()
+def _print_info(name, key):
+    print("Device Name :", name)
+    print("Linux Key (To Replace) :", key)
 
 
 def _process_reg_file(config):
     """ Process the reg file."""
     sections = config.sections()
+
     for section in sections:
-        if len(section) < 98:
-            continue
-        print('\n')
-        print('Dir Name: /var/lib/bluetooth/{}'.format(
-            _bluetooth_dir_name(section)))
-        print('LongTermKey')
-        print('  Key: {}'.format(_format_ltk(config[section]['LTK'])))
-        print('  EncSize: 16')
-        print('  EDiv: {}'.format(_format_ediv(config[section]['EDIV'])))
-        print('  Rand: {}'.format(_format_erand(config[section]['ERand'])))
-        print('LocalSignatureKey')
-        print('  Key: {}'.format(
-            _format_csrk(config[section]['CSRK'])))
-        print('\n====================================\n')
+        if len(section) > 72:
+            print('\n')
+            bt_adapter = _bluetooth_dir_name(section)
+            print('BT Adapter Directory: /var/lib/bluetooth/{}'.format(bt_adapter))
+            print('Paired Devices:')
+            devices = [device for device in config[section]]
+            for device in devices:
+                if device != 'masterirk':
+                    try:
+                        name, old_key = _get_info(bt_adapter, device)
+                        print("Device MAC:", _insert_mac_colons(device))
+                        _print_info(name, old_key)
+                        new_key = config[section][device]
+                        print(f'New Key (Replace With) : {_process_key(new_key)}')
+                    except:
+                        continue
 
 
 def main():
