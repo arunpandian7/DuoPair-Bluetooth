@@ -1,2 +1,5 @@
 env/
-keys.reg
+*.reg
+.vscode
+*.config
+proto.ipynb
