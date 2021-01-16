@@ -1,3 +1,6 @@
+"""
+DuoPair is a tool to pair bluetooth device easily in Dual Boot Windows and Linux. 
+"""
 import configparser
 import argparse
 import os
@@ -6,9 +9,9 @@ from cleaner import clean_reg_file
 
 def _parse_args():
     """Parse arguments."""
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(description="DuoPair is a tool to pair bluetooth device easily in Dual Boot Windows and Linux.")
     parser.add_argument(
-        '--reg_path', help='Path to BTKeys.reg file.', default='BTkeys.reg')
+        '--reg-path', help='Path to BTKeys.reg file.', default='BTKeys.reg')
 
     return parser.parse_args()
 
@@ -96,9 +99,9 @@ def _process_reg_file(config):
 def main():
     """ Main entrypoint to script. """
     args = _parse_args()
-    args['output_file'] = 'keys.reg'
+    setattr(args, 'output', 'key.reg')
     clean_reg_file(args)
-    config = _open_reg_file(args.output_file)
+    config = _open_reg_file(args.output)
     _process_reg_file(config)
 
 
