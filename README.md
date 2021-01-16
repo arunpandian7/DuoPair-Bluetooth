@@ -1,34 +1,37 @@
+# DuoPair Bluetooth 💙🔹
+A script-based tool to enable bluetooth devices pair easily on an Dual Boot (Multi-Boot) machine. 
 
-> I have moved away from using Windows / Linux for my desktop OS so I am no longer maintaining this repo. Feel free to fork and take it over :)
+## ⚠️ Disclaimer
 
-# Dual Boot Bluetooth Pair
+> DuoPair Bluetooth contains scripts accessing and modifying system configuaration files on your Windows / Linux. It may **risk** damaging your machine. I will not take any responsibility and would recommend you to execute at your own risk.
 
-This is a tool I use to pair a bluetooth device with my Windows OS and Linux Mint 17 OS on my dual boot laptop.
+## ⚡ Dependencies
+- Python 3.7 +
+- Bash Shell (Linux)
+- Powershell (Windows)
 
-## Disclaimer
+## 🧪 Tested Environment
+I have used DuoPair for pairing Bluetooth Headphone with my own laptop (Asus Zephyrus G14) running **Windows 10** and **Pop OS 20.10** (Dual Boot).
 
-> This script involves accessing and modifying system files on the Windows / Linux systems and may risk damaging your computer. Proceed with the below steps at your own risk.
+Feel free to create a issue if you would any trouble running this tool. I will try to solve it for you.
 
-## Instructions
+## 👨‍🏫 Instructions
+1. First pair your bluetooth device with your machine booted in Linux and then boot into Windows, pair your bluetooth with your system again.
+2. Download [DuoPair](https://github.com/arunpandian7/dual-boot-bluetooth-pair/releases) into any one of your Windows Partition. (Assuming your Linux Distro alows you to access Windows Partitions from it)
+> My recommendation is to have DuoPair in an flash drive which you can access from both the systems without an hussle.
+3. Open the DuoPair folder in *File Explorer* and right click on **getBTKey.ps1** and select **Run with Powershell** from the Context Menu
+4. Kindly select *Yes* in the Prompt to give User Admin Access for the script to run and fetch keys.
+5. Now you will have your **BTKey.reg** file in C:\ drive. Copy that to your DuoPair Directory.
+6. Boot into Linux now and open terminal in DuoPair Directory.
+7. Run python file duopair.py
 
-> I recommend backing up all config files before attempting the below steps.
-
-The scripts in this project are intended to be executed on your Linux OS using [Python3](https://www.python.org/).
-
- 1. Boot into Linux and pair bluetooth device(s).
- 2. Reboot into Windows and pair bluetooth device(s).
- 3. Download [PSExec](http://live.sysinternals.com/psexec.exe) and run the following command from a Command Prompt running in Administator mode:
-
+```shell
+python3 duopair.py --reg-path [Path to BTKey.reg file]
 ```
-psexec.exe -s -i regedit /e C:\BTKeys.reg HKEY_LOCAL_MACHINE\SYSTEM\ControlSet001\Services\BTHPORT\Parameters\Keys
-```
+8. Follow the script prompts and you will now changed the bluetooth key pair in Linux
+9. Execute `sudo systemctl restart bluetooth` to restart your system bluetooth in Linux.
 
- 4. Copy the `C:\BTKeys.reg` file to a USB key (or leave on `C:` drive if it's accessible from the Linux OS).
- 5. Turn off bluetooth device(s) and boot back into Linux.
- 6. Copy the `BTKeys.reg` file to your Linux filesystem.
- 7. Run `clean_reg_file.py /path/to/BTKeys.reg keys.reg` to clean the file (converts encoding to UTF8 and strips quotation marks).
- 8. Run `bluetooth_fix.py --reg_path keys.reg`.
- 9. From a terminal with `sudo`, navigate to `/var/lib/bluetooth/<ADAPTOR_MAC_ADDRESS>/` and use `ls` to get the mac addresses similar to the bluetooth device you are trying to pair, and re-name the directory to the new mac displayed in the output from step 8.
- 10. Open `/var/lib/bluetooth/<ADAPTOR_MAC>/<DEVICE_MAC>/info` and modify the values as per output from step 8.
- 11. Restart bluetooth with `sudo systemctl restart bluetooth`.
+Now you will enjoy connecting your Bluetooth Device to your Dual Booted Machine hasslefree.
 
+## Acknowledgement
+I owe it to Mark Winterbottom's [Original Project](https://github.com/LondonAppDev/dual-boot-bluetooth-pair) for the idea and his solution which helped to achieve it. 
