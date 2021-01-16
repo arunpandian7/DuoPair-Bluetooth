@@ -60,6 +60,11 @@ def _print_info(name, key):
     print("Device Name :", name)
     print("Linux Key (To Replace) :", key)
 
+def replace_keys(prompt, path, old_key, new_key):
+    if prompt in ['Y', 'y']:
+        path = '/var/lib/bluetooth/'+path+'/info'
+        os.system(f'sudo sed -i s+{old_key}+{new_key}+g {path}')
+
 
 def _process_reg_file(config):
     """ Process the reg file."""
@@ -78,8 +83,11 @@ def _process_reg_file(config):
                         name, old_key = _get_info(bt_adapter, device)
                         print("Device MAC:", _insert_mac_colons(device))
                         _print_info(name, old_key)
-                        new_key = config[section][device]
-                        print(f'New Key (Replace With) : {_process_key(new_key)}')
+                        new_key = _process_key(config[section][device])
+                        print(f'New Key (Replace With) : {new_key}')
+                        prompt = input("Do you want to replace new key? (y/n) ")
+                        device_path = bt_adapter+'/'+_insert_mac_colons(device)
+                        replace_keys(prompt, device_path, old_key, new_key)
                     except:
                         continue
 
