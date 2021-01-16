@@ -1,5 +1,7 @@
 env/
+__pycache__
 *.reg
 .vscode
 *.config
 proto.ipynb
+psexec.exe
